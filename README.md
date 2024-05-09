@@ -37,5 +37,7 @@ Installation on Linux:
 cd /home/ubuntu/cms-env/bin/cms-checker
 python2 cms-checker.py -l [List of Urls] -t [# of Threads]
 ```
+### 7. Images
 
+![Output](https://imgur.com/70U7XUB)
 
