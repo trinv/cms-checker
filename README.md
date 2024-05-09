@@ -1,27 +1,40 @@
 ## Cms Checker
-This tool allows you to check a list of websites if they have cms installed with various useful information
+This tool allows you to check a list of websites if they have CMS installed with various useful information
 also it provide a url contain a list of possible vulnerabilities related to that version.
 ## Usage
-`python cms-checker.py -l [List of Urls] -t [# of Threads]`
+`python2 cms-checker.py -l [List of Urls] -t [# of Threads]`
 
-## Installation
+### 1. Install python & python3 dependencies packages
+```
+apt-get install python-virtualenv
+apt-get install python3-virtualenv
+apt get install virtualenv
+```
 
-`git clone https://github.com/oways/cms-checker.git`
+### 2. Create a Virtual Environment & Install Python 3
+```
+cd /home/ubuntu
+virtualenv -p /usr/bin/python2 cms-env
+```
 
-## Dependencies
+### 3. Activate The Virtual Environment
+```
+cd /home/ubuntu/cms-env/bin
+source activate
+```
 
-Installation on Windows:
+### 4. Downloading or Clone the packages
 
-`c:\python27\python.exe -m pip install -r requirements.txt`
+`git clone https://github.com/trinv/cms-checker.git`
 
+### 5. Dependencies
 Installation on Linux:
 
-`sudo pip install -r requirements.txt`
+`sudo pip2 install -r requirements.txt`
+### 6. Usages
+```
+cd /home/ubuntu/cms-env/bin/cms-checker
+python2 cms-checker.py -l [List of Urls] -t [# of Threads]
+```
 
-## Screenshots
 
-* Terminal Output
-<img src="http://i.imgur.com/iRrnJlE.png" >
-
-* Html Output
-<img src="http://i.imgur.com/N60JyP3.png" >
