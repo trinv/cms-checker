@@ -1,4 +1,4 @@
-## Cms Checker
+## CMS Checker (CMS is Content Management Software)
 This tool allows you to check a list of websites if they have CMS installed with various useful information
 also it provide a url contain a list of possible vulnerabilities related to that version.
 ## Usage
