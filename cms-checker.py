@@ -2,6 +2,8 @@
 
 import sys, os, re, json, requests, threading, bs4, time, subprocess, argparse, socket
 from Queue import Queue
+#from importlib import reload
+#from multiprocessing import Queue
 from pyfiglet import Figlet
 from termcolor import colored
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -11,16 +13,20 @@ import sys
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
-
+#sys.setdefaultencoding("utf-8")
+#if sys.version[0] == '2':
+#	reload(sys)
+#	sys.setdefaultencoding("utf-8")
 listData =[]
 timeout = 15
 threads = 5
 
 f = Figlet(font='slant')
-print colored(f.renderText('CMS Checker'),"red", attrs=['bold'])
-print "==========================="
-print "CMS Checker v3.1\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\nCMSs Included: Wordpress,Joomla,Drupal,Sharepoint\nNote: increase timeout if you have a slow internet connection"
-print "==========================="
+print (colored(f.renderText('CMS Checker'),"red", attrs=['bold']))
+print ("===========================")
+print ("CMS Checker v3.1\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\nCMSs Included: Wordpress,Joomla,Drupal,Sharepoint\nNote: increase timeout if you have a slow intern
+et connection")
+print ("===========================")
 
 path = "result-%s" % time.strftime("%s-%m-%H_%d-%m-%Y")
 outputPath="%s" % path
@@ -56,7 +62,7 @@ class ThreadedFetch(object):
 
 					if content!=0:
 						if not os.path.exists(outputPath):
-							os.mkdir(outputPath,0755)
+							os.mkdir(outputPath,755)
 						htmlpath = "%s/%s.html" %(outputPath,url.replace(":","."))
 						with open(htmlpath , "w+") as f:
 							f.write(content.text.encode('utf-8'))
@@ -73,28 +79,33 @@ class ThreadedFetch(object):
 							srv=""
 						#Drupal 
 						if "/sites/default/files/" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Drupal","Version":"","Reference":""})
-							print colored("%s => [Drupal] Server: %s" % (url,srv), 'green')
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Drupal","Version":"",
+"Reference":""})
+							print (colored("%s => [Drupal] Server: %s" % (url,srv), 'green'))
 
 						#sharepoint
 						elif "MicrosoftSharePointTeamServices" in content.headers:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"SharePoint","Version":content.headers['MicrosoftSharePointTeamServices'],"Reference":""})
-							print colored("%s => [Sharepoint] Server: %s" % (url,srv), 'green')
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"SharePoint","Version"
+:content.headers['MicrosoftSharePointTeamServices'],"Reference":""})
+							print (colored("%s => [Sharepoint] Server: %s" % (url,srv), 'green'))
 
 						#wordpress
 						elif "wp-content" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"WordPress","Version":"","Reference":""})
-							print colored("%s => [Wordpress] Server: %s" % (url,srv), 'green')
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"WordPress","Version":
+"","Reference":""})
+							print (colored("%s => [Wordpress] Server: %s" % (url,srv), 'green'))
 						
 						#joomla
 						elif "com_content" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Joomla","Version":"","Reference":""})
-							print colored("%s => [Joomla] Server: %s" % (url,srv), 'green')
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Joomla","Version":"",
+"Reference":""})
+							print (colored("%s => [Joomla] Server: %s" % (url,srv), 'green'))
 
 						#unkown app / adding server type
 						else:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"","Version":"","Reference":""})
-							print colored("%s => Server: %s" % (url,srv), 'red')
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"","Version":"","Refer
+ence":""})
+							print (colored("%s => Server: %s" % (url,srv), 'red'))
 				except:
 					pass
 				self.queue.task_done()
@@ -119,21 +130,27 @@ class ThreadedFetch(object):
 		if self.queue.qsize() > 0:
 			self.queue.join()
 		if self.queue.qsize()==0 and len(listData)!=0:
-			print "\n------- Version Check ---------\n"
+			print ("\n------- Version Check ---------\n")
 			Fetcher2 = ThreadedFetch2(listData, True, threads)
 			Fetcher2.run()
 
-			print "\nGenerating the Output ..."
-			html='<html><head><title>CMS Checker</title><script src="../js/jquery-1.12.4.js"></script></script><script src="../js/dataTables.bootstrap.min.js"></script><script src="../js/jquery.dataTables.min.js"></script><link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" type="text/css" href="../css/dataTables.bootstrap.min.css"></head><script>$(document).ready(function() {$("#example").DataTable();} );</script><div id="example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap"><table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><th>#</th><th>Title</th><th>Url</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th><th>HTML Snapshot</th><th>Reference</th></thead><tbody>'
+			print ("\nGenerating the Output ...")
+			html='<html><head><title>CMS Checker</title><script src="../js/jquery-1.12.4.js"></script></script><script src="../js/dataTables.bootstrap.min.js"></scr
+ipt><script src="../js/jquery.dataTables.min.js"></script><link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><l
+ink rel="stylesheet" type="text/css" href="../css/dataTables.bootstrap.min.css"></head><script>$(document).ready(function() {$("#example").DataTable();} );</script><div id="exa
+mple_wrapper" class="dataTables_wrapper form-inline dt-bootstrap"><table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><th>#</th><
+th>Title</th><th>Url</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th><th>HTML Snapshot</th><th>Reference</th></thead><tbody>'
 			ID=0
 			for dat in listData:
-				html += "<tr><td>%s</td><td>%s</td><td><a href='http://%s' target='_blank'>%s</a></td><td>%s</td><td>%s</td><td>%s %s</td><td>%s</td><td><a href='./%s.html' target='_blank'>View</a></td><td>%s</td></tr>" % (ID,dat["Title"],dat["Url"],dat["Url"],dat["IP"],dat["Status"],dat["CMS"],dat["Version"],dat["Server"],dat["Url"],dat["Reference"])
+				html += "<tr><td>%s</td><td>%s</td><td><a href='http://%s' target='_blank'>%s</a></td><td>%s</td><td>%s</td><td>%s %s</td><td>%s</td><td><a href
+='./%s.html' target='_blank'>View</a></td><td>%s</td></tr>" % (ID,dat["Title"],dat["Url"],dat["Url"],dat["IP"],dat["Status"],dat["CMS"],dat["Version"],dat["Server"],dat["Url"],
+dat["Reference"])
 				ID = ID+1
 			html += "</tbody></table></div></html>"
 			outputHtml = "%s/index.html" % outputPath
 			with open(outputHtml , "w+") as f:
 			    f.write(html)
-			print colored("Output path: %s\n" % outputHtml, 'green')
+			print (colored("Output path: %s\n" % outputHtml, 'green'))
 
 
 class ThreadedFetch2(object):
@@ -159,27 +176,28 @@ class ThreadedFetch2(object):
 						b = requests.get('http://%s/admin/views/ajax/autocomplete/user/w' % x, verify=True, allow_redirects=True,timeout=timeout)
 						if "Drupal" in a: 
 							fullversion = re.search('[0-9.]+, [0-9]{4}-[0-9]{2}-[0-9]{2}', a).group()
-							print colored('{0} [Drupal] ==> {1}'.format(x, fullversion), 'green')
+							print (colored('{0} [Drupal] ==> {1}'.format(x, fullversion), 'green'))
 							version = re.search('[0-9.]+', a).group()
 							data["Version"] = version
 							data["Reference"] = "https://www.cvedetails.com/google-search-results.php?q=drupal+%s&sa=Search" % version
-							print "Exploits: %s" % data["Reference"]
+							print ("Exploits: %s" % data["Reference"])
 							data["Reference"] = "<a href='%s' target='_blank'>Link</a>" % data["Reference"]
 						else:
 							request = requests.get('http://%s/' % x, verify=True, allow_redirects=True,timeout=timeout)
 							if "drupal.org" in request.content:
 								version = re.search('content="Drupal [0-9]', request.content).group()
 								data["Version"] = version
-								print colored('{0} [Drupal] ==> {1}'.format(x, version), 'green')
+								print (colored('{0} [Drupal] ==> {1}'.format(x, version), 'green'))
 							else:
-								print colored('{0} [Drupal] ==> Version Not Found'.format(x), 'yellow')
+								print (colored('{0} [Drupal] ==> Version Not Found'.format(x), 'yellow'))
 						if b!=0:
 							if 200 == b.status_code:
-								print colored("vuln to autocomplete exploit ==> http://%s/admin/views/ajax/autocomplete/user/w" % x, 'magenta')
+								print (colored("vuln to autocomplete exploit ==> http://%s/admin/views/ajax/autocomplete/user/w" % x, 'magenta')
+)
 
 					if data["CMS"]=="SharePoint":
 						i = 0
-					 	if i<data["Version"]:
+						if i<data["Version"]:
 							ch = data["Version"]
 							if ".0." not in ch:
 								pass
@@ -189,7 +207,7 @@ class ThreadedFetch2(object):
 								ver = "2010 Build %s" % ch
 							else:
 								ver = ch
-							print colored('{0} [SharePoint] ==> {1}'.format(x,ver), 'green')
+							print (colored('{0} [SharePoint] ==> {1}'.format(x,ver), 'green'))
 							data["Version"] = ver
 
 
@@ -203,13 +221,13 @@ class ThreadedFetch2(object):
 						if a: 
 							v = re.search('\?v=[0-9.]+<\/', a.text).group()
 							version = re.search('[0-9.]+', v).group()
-							print colored('{0} [Wordpress] ==> {1}'.format(x, version), 'green')
+							print (colored('{0} [Wordpress] ==> {1}'.format(x, version), 'green'))
 							data["Version"] = version.replace('.','')
 							data["Reference"] = "https://wpvulndb.com/wordpresses/%s" % version.replace('.','')
-							print "Exploits: %s" % data["Reference"]
+							print ("Exploits: %s" % data["Reference"])
 							data["Reference"] = "<a href='%s' target='_blank'>Link</a>" % data["Reference"]
 						else:
-							print colored('{0} [Wordpress] ==> Version Not Found'.format(x), 'yellow')
+							print (colored('{0} [Wordpress] ==> Version Not Found'.format(x), 'yellow'))
 
 						if data["CMS"]=="Joomla":
 							a=0
@@ -222,9 +240,9 @@ class ThreadedFetch2(object):
 								v = re.search('<version>[0-9.]+<\/', a.text).group()
 								version = re.search('[0-9.]+', v).group()
 								data["Version"] =  version
-								print colored('{0} [Joomla] ==> {1}'.format(x, version), 'green')
+								print (colored('{0} [Joomla] ==> {1}'.format(x, version), 'green'))
 							else:
-								print colored('{0} [Joomla] ==> Version Not Found'.format(x), 'yellow')
+								print (colored('{0} [Joomla] ==> Version Not Found'.format(x), 'yellow'))
 				except:
 					pass
 				self.queue.task_done()
@@ -250,10 +268,10 @@ class ThreadedFetch2(object):
 			self.queue.join()
 
 class MyParser(argparse.ArgumentParser):
-    	def error(self, message):
-    		sys.stderr.write(colored('\nExample: python cms-checker.py -l ~/list.txt -t 10\n\n' ,"yellow" ))
-        	self.print_help()
-        	sys.exit(2)
+	def error(self, message):
+		sys.stderr.write(colored('\nExample: python cms-checker.py -l ~/list.txt -t 10\n\n' ,"yellow" ))
+		self.print_help()
+		sys.exit(2)
 
 def main():
 	threads = 5
@@ -283,14 +301,15 @@ def main():
 		pass
 
 	urls = []
-	httpPorts = [80,280,443,591,593,832,981,1311,2480,444,4444,4567,5000,5104,5280,5800,8443,5988,598,7000,7001,7002,8008,8080,8042,8088,8243,8280,8281,8530,8531,8887,8888,9080,9443,9981,11371,12043,12046,12443,16080,18091,18092]
+	httpPorts = [80,280,443,591,593,832,981,1311,2480,444,4444,4567,5000,5104,5280,5800,8443,5988,598,7000,7001,7002,8008,8080,8042,8088,8243,8280,8281,8530,8531,8887,8888,
+9080,9443,9981,11371,12043,12046,12443,16080,18091,18092]
 	for line in urlslist:
 		if allports:
 			for port in httpPorts:
 				urls.append("%s:%s"%(line.rstrip(),port))
 		else:
 			urls.append(line.rstrip())
-	print "\n\n------- Quick Check ---------\n"
+	print ("\n\n------- Quick Check ---------\n")
 	Fetcher = ThreadedFetch(urls, True, threads)
 	Fetcher.run()
 
