@@ -4,14 +4,14 @@ also it provide a url contain a list of possible vulnerabilities related to that
 ## Usage
 `python2 cms-checker.py -l [List of Urls] -t [# of Threads]`
 
-### 1. Install python & python3 dependencies packages
+### 1. Install python virtualenv dependencies packages
 ```
 apt-get install python-virtualenv
 apt-get install python3-virtualenv
 apt get install virtualenv
 ```
 
-### 2. Create a Virtual Environment & Install Python 3
+### 2. Create a Virtual Environment
 ```
 cd /home/ubuntu
 virtualenv -p /usr/bin/python2 cms-env
@@ -31,7 +31,8 @@ source activate
 Installation on Linux:
 
 `sudo pip2 install -r requirements.txt`
-### 6. Usages
+
+### 6. Run
 ```
 cd /home/ubuntu/cms-env/bin/cms-checker
 python2 cms-checker.py -l [List of Urls] -t [# of Threads]
