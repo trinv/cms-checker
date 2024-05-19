@@ -81,31 +81,31 @@ class ThreadedFetch(object):
 						if "/sites/default/files/" in content.text:
 							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Drupal","Version":"",
 "Reference":""})
-							print (colored("%s => [Drupal] Server: %s" % (url,srv), 'green'))
+							print (colored("%s , Drupal, %s" % (url,srv), 'green'))
 
 						#sharepoint
 						elif "MicrosoftSharePointTeamServices" in content.headers:
 							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"SharePoint","Version"
 :content.headers['MicrosoftSharePointTeamServices'],"Reference":""})
-							print (colored("%s => [Sharepoint] Server: %s" % (url,srv), 'green'))
+							print (colored("%s , Sharepoint, %s" % (url,srv), 'green'))
 
 						#wordpress
 						elif "wp-content" in content.text:
 							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"WordPress","Version":
 "","Reference":""})
-							print (colored("%s => [Wordpress] Server: %s" % (url,srv), 'green'))
+							print (colored("%s , Wordpress, %s" % (url,srv), 'green'))
 						
 						#joomla
 						elif "com_content" in content.text:
 							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Joomla","Version":"",
 "Reference":""})
-							print (colored("%s => [Joomla] Server: %s" % (url,srv), 'green'))
+							print (colored("%s , Joomla, %s" % (url,srv), 'green'))
 
 						#unkown app / adding server type
 						else:
 							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"","Version":"","Refer
 ence":""})
-							print (colored("%s => Server: %s" % (url,srv), 'red'))
+							print (colored("%s , None, %s" % (url,srv), 'red'))
 				except:
 					pass
 				self.queue.task_done()
