@@ -1,54 +1,41 @@
 #!/usr/bin/python3
 
-import sys
 import os
 import re
 import json
 import requests
 import threading
+import bs4
 import time
 import subprocess
 import argparse
 import socket
 from queue import Queue
-from bs4 import BeautifulSoup
+from pyfiglet import Figlet
 from termcolor import colored
-from importlib import reload
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-# Disable SSL warnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Globals
 listData = []
 timeout = 15
 threads = 5
 
-# ASCII Art for Script Banner
-print(colored("CMS Checker", "red", attrs=["bold"]))
-print("=" * 30)
-print(
-    "CMS Checker v4.0\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\n"
-    "CMSs Included: Wordpress, Joomla, Drupal, Sharepoint\n"
-    "Note: Increase timeout if you have a slow internet connection"
-)
-print("=" * 30)
+f = Figlet(font='slant')
+print(colored(f.renderText('CMS Checker'), "red", attrs=['bold']))
+print("===========================")
+print("CMS Checker v3.1\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\nCMSs Included: Wordpress,Joomla,Drupal,Sharepoint\nNote: increase timeout if you have a slow internet connection")
+print("===========================")
 
-# Output directory setup
-path = f"result-{time.strftime('%s-%m-%H_%d-%m-%Y')}"
-outputPath = path
+path = "result-%s" % time.strftime("%s-%m-%H_%d-%m-%Y")
+outputPath = "%s" % path
 
-# Get IP from hostname
+
 def getServerIP(x):
-    try:
-        return socket.gethostbyname(x)
-    except socket.error as e:
-        print(colored(f"Error resolving IP for {x}: {e}", "yellow"))
-        return "Unknown"
+    return socket.gethostbyname(x)
 
 
-# Threaded CMS Fetching Class
-class ThreadedFetch:
+class ThreadedFetch(object):
     class FetchUrl(threading.Thread):
         def __init__(self, queue):
             threading.Thread.__init__(self)
@@ -56,76 +43,65 @@ class ThreadedFetch:
 
         def run(self):
             while not self.queue.empty():
-                url = self.queue.get()
                 try:
-                    self.process_url(url)
+                    url = self.queue.get()
+                    title = ""
+                    ip_port = ""
+                    headers = {
+                        'User-agent': 'Mozilla/5.0 (Windows; Intel 10.13; rv:52.0) Gecko/20100101 Firefox/52.0',
+                        'X-Forwarded-For': '127.0.0.1'
+                    }
+
+                    response = requests.get(f'http://{url}/', timeout=timeout, headers=headers, verify=False,
+                                            allow_redirects=True)
+                    response.encoding = 'utf-8'  # Ensure response is handled as UTF-8
+                    html = bs4.BeautifulSoup(response.text, "html.parser")
+                    ip_ = getServerIP(url) if ":" not in url else url
+
+                    if response.status_code == 200:
+                        os.makedirs(outputPath, mode=0o755, exist_ok=True)
+                        htmlpath = f"{outputPath}/{url.replace(':', '.')}.html"
+                        with open(htmlpath, "w", encoding="utf-8") as f:
+                            f.write(response.text)
+
+                        title = html.title.text.strip() if html.title else ""
+                        srv = response.headers.get('Server', "")
+
+                        # CMS detection
+                        cms = None
+                        if "/sites/default/files/" in response.text:
+                            cms = "Drupal"
+                        elif "MicrosoftSharePointTeamServices" in response.headers:
+                            cms = "SharePoint"
+                        elif "wp-content" in response.text:
+                            cms = "WordPress"
+                        elif "com_content" in response.text:
+                            cms = "Joomla"
+
+                        cms_data = {
+                            "Url": url,
+                            "Title": title,
+                            "IP": ip_,
+                            "Status": response.status_code,
+                            "Server": srv,
+                            "CMS": cms or "",
+                            "Version": "",
+                            "Reference": ""
+                        }
+
+                        if cms:
+                            print(colored(f"{url} => [{cms}] Server: {srv}", "green"))
+                        else:
+                            print(colored(f"{url} => Server: {srv}", "red"))
+
+                        listData.append(cms_data)
                 except Exception as e:
                     print(colored(f"Error processing {url}: {e}", "yellow"))
                 finally:
                     self.queue.task_done()
 
-        def process_url(self, url):
-            title = ""
-            ip_ = getServerIP(url)
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-                "X-Forwarded-For": "127.0.0.1",
-            }
-            try:
-                response = requests.get(
-                    f"http://{url}/", timeout=timeout, headers=headers, verify=False, allow_redirects=True
-                )
-            except requests.RequestException as e:
-                print(colored(f"Request error for {url}: {e}", "red"))
-                return
-
-            html = BeautifulSoup(response.text, "html.parser")
-            title = html.title.text.strip() if html.title else "No Title"
-            srv = response.headers.get("Server", "Unknown Server")
-            
-            cms_detected = False
-            # CMS Detection Logic
-            if "/sites/default/files/" in response.text:
-                cms_detected = True
-                cms = "Drupal"
-            elif "MicrosoftSharePointTeamServices" in response.headers:
-                cms_detected = True
-                cms = "SharePoint"
-            elif "wp-content" in response.text:
-                cms_detected = True
-                cms = "WordPress"
-            elif "com_content" in response.text:
-                cms_detected = True
-                cms = "Joomla"
-            else:
-                cms = "Unknown"
-
-            if cms_detected:
-                print(colored(f"{url} => [{cms}] Server: {srv}", "green"))
-            else:
-                print(colored(f"{url} => Server: {srv}", "yellow"))
-
-            # Save to list
-            listData.append(
-                {
-                    "Url": url,
-                    "Title": title,
-                    "IP": ip_,
-                    "Status": response.status_code,
-                    "Server": srv,
-                    "CMS": cms,
-                    "Version": "",
-                    "Reference": "",
-                }
-            )
-            # Save raw HTML snapshot
-            if not os.path.exists(outputPath):
-                os.makedirs(outputPath, mode=0o755, exist_ok=True)
-            with open(f"{outputPath}/{url.replace(':', '.')}.html", "w", encoding="utf-8") as f:
-                f.write(response.text)
-
-    def __init__(self, urls, thread_count=5):
-        self.queue = Queue()
+    def __init__(self, urls=[], thread_count=5):
+        self.queue = Queue(0)
         self.threads = []
         self.thread_count = thread_count
         for url in urls:
@@ -138,46 +114,72 @@ class ThreadedFetch:
             self.threads.append(thread)
         self.queue.join()
 
+        if listData:
+            self.generate_output()
 
-# Argument Parser
-def parse_args():
-    parser = argparse.ArgumentParser(description="CMS Checker")
-    parser.add_argument(
-        "-l", "--list", required=True, help="Path to the list of URLs (one per line)", type=argparse.FileType("r")
-    )
-    parser.add_argument(
-        "-t", "--threads", help="Number of threads [Default: 5]", type=int, default=5
-    )
-    return parser.parse_args()
+    @staticmethod
+    def generate_output():
+        print("\nGenerating the Output ...")
+        html = '''
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>CMS Checker</title>
+            <script src="../js/jquery-1.12.4.js"></script>
+            <script src="../js/dataTables.bootstrap.min.js"></script>
+            <script src="../js/jquery.dataTables.min.js"></script>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+            <link rel="stylesheet" href="../css/dataTables.bootstrap.min.css">
+            <script>
+                $(document).ready(function() {
+                    $("#example").DataTable();
+                });
+            </script>
+        </head>
+        <body>
+            <div id="example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <th>#</th><th>Title</th><th>Url</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th><th>HTML Snapshot</th><th>Reference</th>
+                    </thead>
+                    <tbody>
+        '''
+        for i, data in enumerate(listData, start=1):  # Start numbering from 1
+            html += f"""
+            <tr>
+                <td>{i}</td>
+                <td>{data["Title"]}</td>
+                <td><a href='http://{data["Url"]}' target='_blank'>{data["Url"]}</a></td>
+                <td>{data["IP"]}</td>
+                <td>{data["Status"]}</td>
+                <td>{data["CMS"]}</td>
+                <td>{data["Server"]}</td>
+                <td><a href='./{data["Url"].replace(":", ".")}.html' target='_blank'>View</a></td>
+                <td>{data["Reference"]}</td>
+            </tr>
+            """
+        html += '''
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+        '''
+        outputHtml = f"{outputPath}/index.html"
+        with open(outputHtml, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(colored(f"Output path: {outputHtml}\n", "green"))
 
 
 def main():
-    args = parse_args()
-    urls = [line.strip() for line in args.list.readlines() if line.strip()]
-    thread_count = min(args.threads, 20)
+    parser = argparse.ArgumentParser(description="CMS Checker")
+    parser.add_argument('-l', required=True, help="List of URLs", type=argparse.FileType('r'))
+    parser.add_argument('-t', help="Number of threads [Default: 5]", type=int, default=5)
+    args = parser.parse_args()
 
-    print("\nStarting CMS Checker...\n")
-    fetcher = ThreadedFetch(urls, thread_count)
+    urls = [line.strip() for line in args.l.readlines()]
+    fetcher = ThreadedFetch(urls, args.t)
     fetcher.run()
-
-    # Generate HTML Report
-    if listData:
-        print("\nGenerating Output...")
-        output_file = f"{outputPath}/index.html"
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write("<html><head><title>CMS Checker Results</title></head><body>")
-            f.write("<h1>CMS Checker Results</h1><table border='1'>")
-            f.write(
-                "<tr><th>#</th><th>Title</th><th>URL</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th></tr>"
-            )
-            for idx, data in enumerate(listData):
-                f.write(
-                    f"<tr><td>{idx}</td><td>{data['Title']}</td><td>{data['Url']}</td>"
-                    f"<td>{data['IP']}</td><td>{data['Status']}</td><td>{data['CMS']}</td>"
-                    f"<td>{data['Server']}</td></tr>"
-                )
-            f.write("</table></body></html>")
-        print(colored(f"Output saved to {output_file}", "green"))
 
 
 if __name__ == "__main__":
