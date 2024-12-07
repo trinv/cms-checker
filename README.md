@@ -6,9 +6,9 @@ also it provide a url contain a list of possible vulnerabilities related to that
 
 ### 1. Install python virtualenv dependencies packages
 ```
-apt-get install python-virtualenv
 apt-get install python3-virtualenv
-apt get install virtualenv
+apt-get install virtualenv
+apt-get install python3-bs4
 ```
 
 ### 2. Create a Virtual Environment
