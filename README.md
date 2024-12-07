@@ -9,35 +9,29 @@ also it provide a url contain a list of possible vulnerabilities related to that
 apt-get install python3-virtualenv
 apt-get install virtualenv
 apt-get install python3-bs4
+apt-get install python3-pyfiglet
+apt-get install python3-termcolor
+```
+### 2. Checkout source code and create virtualenv
+
+```
+git clone https://github.com/trinv/cms-checker.git /opt/cms-checker
+cd /opt/cms-checker
+python3 -mvenv ./venv
 ```
 
-### 2. Create a Virtual Environment
+### 3. Activate your python3 environment and install libraries:
 ```
-cd /home/ubuntu
-virtualenv -p /usr/bin/python2 cms-env
-```
-
-### 3. Activate The Virtual Environment
-```
-cd /home/ubuntu/cms-env/bin
-source activate
+source ./venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-### 4. Downloading or Clone the packages
-
-`git clone https://github.com/trinv/cms-checker.git`
-
-### 5. Dependencies
-Installation on Linux:
-
-`sudo pip2 install -r requirements.txt`
-
-### 6. Run
+### 4. Run
 ```
-cd /home/ubuntu/cms-env/bin/cms-checker
-python2 cms-checker.py -l [List of Urls] -t [# of Threads]
+python3 cms-checker.py -l [List of Urls] -t [# of Threads]
 ```
-### 7. Images
+### 5. Images
 
 ![Output](https://i.imgur.com/70U7XUB.png)
 
