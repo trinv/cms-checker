@@ -24,8 +24,7 @@ threads = 5
 f = Figlet(font='slant')
 print (colored(f.renderText('CMS Checker'),"red", attrs=['bold']))
 print ("===========================")
-print ("CMS Checker v3.1\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\nCMSs Included: Wordpress,Joomla,Drupal,Sharepoint\nNote: increase timeout if you have a slow intern
-et connection")
+print ("CMS Checker v3.1\nAuthor: Oways\nTwitter: https://twitter.com/0w4ys\nCMSs Included: Wordpress,Joomla,Drupal,Sharepoint\nNote: increase timeout if you have a slow internet connection")
 print ("===========================")
 
 path = "result-%s" % time.strftime("%s-%m-%H_%d-%m-%Y")
@@ -79,32 +78,27 @@ class ThreadedFetch(object):
 							srv=""
 						#Drupal 
 						if "/sites/default/files/" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Drupal","Version":"",
-"Reference":""})
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Drupal","Version":"","Reference":""})
 							print (colored("%s , Drupal, %s" % (url,srv), 'green'))
 
 						#sharepoint
 						elif "MicrosoftSharePointTeamServices" in content.headers:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"SharePoint","Version"
-:content.headers['MicrosoftSharePointTeamServices'],"Reference":""})
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"SharePoint","Version":content.headers['MicrosoftSharePointTeamServices'],"Reference":""})
 							print (colored("%s , Sharepoint, %s" % (url,srv), 'green'))
 
 						#wordpress
 						elif "wp-content" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"WordPress","Version":
-"","Reference":""})
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"WordPress","Version":"","Reference":""})
 							print (colored("%s , Wordpress, %s" % (url,srv), 'green'))
 						
 						#joomla
 						elif "com_content" in content.text:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Joomla","Version":"",
-"Reference":""})
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"Joomla","Version":"","Reference":""})
 							print (colored("%s , Joomla, %s" % (url,srv), 'green'))
 
 						#unkown app / adding server type
 						else:
-							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"","Version":"","Refer
-ence":""})
+							listData.append({"Url":url,"Title":title,"IP":ip_,"Status":content.status_code,"Server":srv,"CMS":"","Version":"","Reference":""})
 							print (colored("%s , None, %s" % (url,srv), 'red'))
 				except:
 					pass
@@ -135,16 +129,10 @@ ence":""})
 			Fetcher2.run()
 
 			print ("\nGenerating the Output ...")
-			html='<html><head><title>CMS Checker</title><script src="../js/jquery-1.12.4.js"></script></script><script src="../js/dataTables.bootstrap.min.js"></scr
-ipt><script src="../js/jquery.dataTables.min.js"></script><link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><l
-ink rel="stylesheet" type="text/css" href="../css/dataTables.bootstrap.min.css"></head><script>$(document).ready(function() {$("#example").DataTable();} );</script><div id="exa
-mple_wrapper" class="dataTables_wrapper form-inline dt-bootstrap"><table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><th>#</th><
-th>Title</th><th>Url</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th><th>HTML Snapshot</th><th>Reference</th></thead><tbody>'
+			html='<html><head><title>CMS Checker</title><script src="../js/jquery-1.12.4.js"></script></script><script src="../js/dataTables.bootstrap.min.js"></script><script src="../js/jquery.dataTables.min.js"></script><link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" type="text/css" href="../css/dataTables.bootstrap.min.css"></head><script>$(document).ready(function() {$("#example").DataTable();} );</script><div id="example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap"><table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><th>#</th><th>Title</th><th>Url</th><th>IP</th><th>Status</th><th>CMS</th><th>Server</th><th>HTML Snapshot</th><th>Reference</th></thead><tbody>'
 			ID=0
 			for dat in listData:
-				html += "<tr><td>%s</td><td>%s</td><td><a href='http://%s' target='_blank'>%s</a></td><td>%s</td><td>%s</td><td>%s %s</td><td>%s</td><td><a href
-='./%s.html' target='_blank'>View</a></td><td>%s</td></tr>" % (ID,dat["Title"],dat["Url"],dat["Url"],dat["IP"],dat["Status"],dat["CMS"],dat["Version"],dat["Server"],dat["Url"],
-dat["Reference"])
+				html += "<tr><td>%s</td><td>%s</td><td><a href='http://%s' target='_blank'>%s</a></td><td>%s</td><td>%s</td><td>%s %s</td><td>%s</td><td><a href='./%s.html' target='_blank'>View</a></td><td>%s</td></tr>" % (ID,dat["Title"],dat["Url"],dat["Url"],dat["IP"],dat["Status"],dat["CMS"],dat["Version"],dat["Server"],dat["Url"],dat["Reference"])
 				ID = ID+1
 			html += "</tbody></table></div></html>"
 			outputHtml = "%s/index.html" % outputPath
@@ -192,8 +180,7 @@ class ThreadedFetch2(object):
 								print (colored('{0} [Drupal] ==> Version Not Found'.format(x), 'yellow'))
 						if b!=0:
 							if 200 == b.status_code:
-								print (colored("vuln to autocomplete exploit ==> http://%s/admin/views/ajax/autocomplete/user/w" % x, 'magenta')
-)
+								print (colored("vuln to autocomplete exploit ==> http://%s/admin/views/ajax/autocomplete/user/w" % x, 'magenta'))
 
 					if data["CMS"]=="SharePoint":
 						i = 0
@@ -301,8 +288,7 @@ def main():
 		pass
 
 	urls = []
-	httpPorts = [80,280,443,591,593,832,981,1311,2480,444,4444,4567,5000,5104,5280,5800,8443,5988,598,7000,7001,7002,8008,8080,8042,8088,8243,8280,8281,8530,8531,8887,8888,
-9080,9443,9981,11371,12043,12046,12443,16080,18091,18092]
+	httpPorts = [80,280,443,591,593,832,981,1311,2480,444,4444,4567,5000,5104,5280,5800,8443,5988,598,7000,7001,7002,8008,8080,8042,8088,8243,8280,8281,8530,8531,8887,8888,9080,9443,9981,11371,12043,12046,12443,16080,18091,18092]
 	for line in urlslist:
 		if allports:
 			for port in httpPorts:
