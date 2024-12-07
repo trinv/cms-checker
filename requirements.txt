@@ -6,4 +6,3 @@ pyfiglet
 argparse
 bs4
 requests
-pyfiglet
